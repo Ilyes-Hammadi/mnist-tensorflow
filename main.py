@@ -22,18 +22,17 @@ from __future__ import division
 from __future__ import print_function
 
 import os.path
-import pickle
-import numpy as np
-from sklearn import metrics
-import tensorflow as tf
-import matplotlib.pyplot as plt
 from time import time
 
+from sklearn import metrics
+import tensorflow as tf
+import tensorflow.contrib.layers as layers
+import tensorflow.contrib.learn as learn
+import matplotlib.pyplot as plt
 import colorama
 from colorama import Fore, Back, Style
 
-import tensorflow.contrib.layers as layers
-import tensorflow.contrib.learn as learn
+
 
 
 def max_pool_2x2(tensor_in):
@@ -100,14 +99,17 @@ def main(img):
     # If the model is already trained change steps to zero
     if os.path.isdir('./' + model_dir_name):
         steps = 0
-        message = Fore.YELLOW + "Model already trained\nLoading model time: "
+        t0 = time()
+        classifier.fit(mnist.train.images, mnist.train.labels, batch_size=100, steps=steps)
+        print(Fore.YELLOW + "Model already trained\nLoading model" + Style.RESET_ALL)
     else:
         steps = 2000
-        message = Fore.GREEN + "Training time: "
+        print(Fore.GREEN + 'The model is in training mode' + Style.RESET_ALL)
+        t0 = time()
+        classifier.fit(mnist.train.images, mnist.train.labels, batch_size=100, steps=steps)
+        print(Fore.GREEN + "Training time: " + str(round(time()-t0, 3)) +  "s" + Style.RESET_ALL)
 
-    t0 = time()
-    classifier.fit(mnist.train.images, mnist.train.labels, batch_size=100, steps=steps)
-    print(message + str(round(time()-t0, 3)) +  "s" + Style.RESET_ALL)
+
 
     ### First predection to calculate the model accuracy
     pred = classifier.predict(mnist.test.images)
